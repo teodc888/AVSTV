@@ -1,0 +1,570 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AVSTV</title>
+<link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@400;600;700;800&family=Barlow:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #0e0e0e;
+    --surface: #191919;
+    --surface2: #222222;
+    --border: #2a2a2a;
+    --accent: #e8003d;
+    --accent-dim: rgba(232,0,61,0.12);
+    --text: #f5f5f5;
+    --text-mid: #888;
+    --text-dim: #444;
+    --font-head: 'Barlow Condensed', sans-serif;
+    --font-body: 'Barlow', sans-serif;
+    --r: 8px;
+  }
+
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  html, body {
+    min-height: 100%;
+    background: var(--bg);
+    color: var(--text);
+    font-family: var(--font-body);
+  }
+
+  .view { display: none; min-height: 100vh; flex-direction: column; }
+  .view.active { display: flex; }
+
+  /* ── HEADER ── */
+  header {
+    display: flex;
+    align-items: center;
+    padding: 0 32px;
+    height: 60px;
+    border-bottom: 1px solid var(--border);
+    background: var(--bg);
+    flex-shrink: 0;
+    gap: 18px;
+  }
+
+  .logo {
+    font-family: var(--font-head);
+    font-size: 26px;
+    font-weight: 800;
+    letter-spacing: 4px;
+    color: var(--text);
+    user-select: none;
+  }
+  .logo em { color: var(--accent); font-style: normal; }
+
+  .live-badge {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-family: var(--font-head);
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 2px;
+    color: var(--accent);
+    text-transform: uppercase;
+  }
+  .dot {
+    width: 6px; height: 6px;
+    background: var(--accent);
+    border-radius: 50%;
+    animation: blink 1.4s ease-in-out infinite;
+  }
+  @keyframes blink { 0%,100%{opacity:1} 50%{opacity:.2} }
+
+  .spacer { flex: 1; }
+
+  .btn-back {
+    display: flex;
+    align-items: center;
+    gap: 7px;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--r);
+    color: var(--text-mid);
+    font-family: var(--font-body);
+    font-size: 13px;
+    font-weight: 500;
+    padding: 7px 14px;
+    cursor: pointer;
+    transition: all .15s;
+  }
+  .btn-back:hover { color: var(--text); border-color: #444; }
+
+  .btn-fs {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--r);
+    color: var(--text-mid);
+    width: 36px; height: 36px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    font-size: 16px;
+    transition: all .15s;
+  }
+  .btn-fs:hover { color: var(--text); border-color: #444; }
+
+  .player-title {
+    font-family: var(--font-head);
+    font-size: 20px;
+    font-weight: 700;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+  }
+
+  /* ── HOME BODY ── */
+  .home-body {
+    flex: 1;
+    padding: 48px 32px 64px;
+    max-width: 1080px;
+    width: 100%;
+    margin: 0 auto;
+  }
+
+  .hero {
+    margin-bottom: 52px;
+  }
+  .hero h1 {
+    font-family: var(--font-head);
+    font-size: 52px;
+    font-weight: 800;
+    letter-spacing: 1px;
+    line-height: 1.05;
+    margin-bottom: 10px;
+  }
+  .hero h1 em { color: var(--accent); font-style: normal; }
+  .hero p {
+    color: var(--text-mid);
+    font-size: 15px;
+    font-weight: 300;
+  }
+
+  /* ── SECTION ── */
+  .section { margin-bottom: 44px; }
+
+  .section-label {
+    font-family: var(--font-head);
+    font-size: 12px;
+    font-weight: 600;
+    letter-spacing: 3px;
+    color: var(--text-dim);
+    text-transform: uppercase;
+    margin-bottom: 16px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+  .section-label::after {
+    content: '';
+    flex: 1;
+    height: 1px;
+    background: var(--border);
+  }
+
+  /* ── CHANNEL GRID ── */
+  .grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(148px, 1fr));
+    gap: 10px;
+  }
+
+  .ch {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--r);
+    padding: 24px 14px 18px;
+    cursor: pointer;
+    text-align: center;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 10px;
+    position: relative;
+    overflow: hidden;
+    transition: border-color .18s, transform .18s, box-shadow .18s;
+    animation: up .35s ease both;
+  }
+  .ch::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: var(--accent-dim);
+    opacity: 0;
+    transition: opacity .18s;
+  }
+  .ch:hover {
+    border-color: var(--accent);
+    transform: translateY(-3px);
+    box-shadow: 0 10px 30px rgba(0,0,0,.5);
+  }
+  .ch:hover::after { opacity: 1; }
+  .ch:active { transform: translateY(0); }
+
+  @keyframes up {
+    from { opacity: 0; transform: translateY(12px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+  .ch:nth-child(1)  { animation-delay: .03s }
+  .ch:nth-child(2)  { animation-delay: .06s }
+  .ch:nth-child(3)  { animation-delay: .09s }
+  .ch:nth-child(4)  { animation-delay: .12s }
+  .ch:nth-child(5)  { animation-delay: .15s }
+  .ch:nth-child(6)  { animation-delay: .18s }
+  .ch:nth-child(7)  { animation-delay: .21s }
+  .ch:nth-child(8)  { animation-delay: .24s }
+  .ch:nth-child(9)  { animation-delay: .27s }
+  .ch:nth-child(10) { animation-delay: .30s }
+  .ch:nth-child(11) { animation-delay: .33s }
+  .ch:nth-child(12) { animation-delay: .36s }
+
+  .live-pill {
+    position: absolute;
+    top: 9px; right: 9px;
+    background: var(--accent);
+    color: #fff;
+    font-size: 8px;
+    font-weight: 700;
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+    padding: 2px 6px;
+    border-radius: 3px;
+    z-index: 1;
+  }
+
+  .ch-icon {
+    width: 52px; height: 52px;
+    border-radius: 10px;
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 24px;
+    transition: transform .18s;
+    z-index: 1;
+    position: relative;
+  }
+  .ch:hover .ch-icon { transform: scale(1.1); }
+
+  .ch-name {
+    font-family: var(--font-head);
+    font-size: 17px;
+    font-weight: 700;
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+    color: var(--text);
+    z-index: 1;
+    position: relative;
+    line-height: 1;
+  }
+
+  .ch-sub {
+    font-size: 10px;
+    color: var(--text-dim);
+    letter-spacing: .5px;
+    z-index: 1;
+    position: relative;
+    margin-top: -4px;
+  }
+
+  /* ── PLAYER ── */
+  #view-player {
+    background: #000;
+    height: 100vh;
+  }
+  #view-player header {
+    background: rgba(0,0,0,.95);
+    border-bottom-color: #1c1c1c;
+  }
+
+  #frame-wrap {
+    flex: 1;
+    position: relative;
+    overflow: hidden;
+  }
+
+  #the-iframe {
+    width: 100%;
+    height: 100%;
+    border: none;
+    display: block;
+  }
+
+  /* Loader */
+  #loader {
+    position: absolute;
+    inset: 0;
+    background: #000;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 18px;
+    z-index: 10;
+    transition: opacity .5s;
+  }
+  #loader.gone { opacity: 0; pointer-events: none; }
+
+  .loader-brand {
+    font-family: var(--font-head);
+    font-size: 40px;
+    font-weight: 800;
+    letter-spacing: 6px;
+    color: #1e1e1e;
+  }
+  .loader-brand em { color: rgba(232,0,61,.4); font-style: normal; }
+
+  .loader-ch {
+    font-family: var(--font-head);
+    font-size: 20px;
+    font-weight: 700;
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    color: #2a2a2a;
+  }
+
+  .bar-wrap {
+    width: 140px;
+    height: 2px;
+    background: #181818;
+    border-radius: 2px;
+    overflow: hidden;
+  }
+  .bar-fill {
+    height: 100%;
+    background: var(--accent);
+    border-radius: 2px;
+    animation: sweep 1.1s ease-in-out infinite;
+  }
+  @keyframes sweep {
+    0%   { transform: translateX(-100%); width: 50%; }
+    100% { transform: translateX(300%);  width: 50%; }
+  }
+</style>
+</head>
+<body>
+
+<!-- ═══════════════ HOME ═══════════════ -->
+<div id="view-home" class="view active">
+  <header>
+    <div class="logo"><em>AV</em>STV</div>
+    <div class="live-badge"><div class="dot"></div>En vivo</div>
+    <div class="spacer"></div>
+  </header>
+
+  <div class="home-body">
+
+    <div class="hero">
+      <h1>Todos tus <em>canales</em>,<br>un solo lugar.</h1>
+      <p>Hacé clic en un canal para comenzar a ver.</p>
+    </div>
+
+    <!-- ESPN -->
+    <div class="section">
+      <div class="section-label">ESPN</div>
+      <div class="grid">
+
+        <div class="ch" onclick="play('ESPN 1', '⚽', 'https://streamtpnew.com/global1.php?stream=espn')">
+          <span class="live-pill">LIVE</span>
+          <div class="ch-icon">⚽</div>
+          <div class="ch-name">ESPN 1</div>
+          <div class="ch-sub">Deportes</div>
+        </div>
+
+        <div class="ch" onclick="play('ESPN 2', '🎽', 'https://streamtpnew.com/global1.php?stream=espn2')">
+          <span class="live-pill">LIVE</span>
+          <div class="ch-icon">🎽</div>
+          <div class="ch-name">ESPN 2</div>
+          <div class="ch-sub">Deportes</div>
+        </div>
+
+        <div class="ch" onclick="play('ESPN 3', '🏅', 'https://streamtpnew.com/global1.php?stream=espn3')">
+          <span class="live-pill">LIVE</span>
+          <div class="ch-icon">🏅</div>
+          <div class="ch-name">ESPN 3</div>
+          <div class="ch-sub">Deportes</div>
+        </div>
+
+        <div class="ch" onclick="play('ESPN 4', '🏟️', 'https://streamtpnew.com/global1.php?stream=espn4')">
+          <span class="live-pill">LIVE</span>
+          <div class="ch-icon">🏟️</div>
+          <div class="ch-name">ESPN 4</div>
+          <div class="ch-sub">Deportes</div>
+        </div>
+
+        <div class="ch" onclick="play('ESPN 5', '🥇', 'https://streamtpnew.com/global1.php?stream=espn5')">
+          <span class="live-pill">LIVE</span>
+          <div class="ch-icon">🥇</div>
+          <div class="ch-name">ESPN 5</div>
+          <div class="ch-sub">Deportes</div>
+        </div>
+
+        <div class="ch" onclick="play('ESPN 6', '🏆', 'https://streamtpnew.com/global1.php?stream=espn6')">
+          <span class="live-pill">LIVE</span>
+          <div class="ch-icon">🏆</div>
+          <div class="ch-name">ESPN 6</div>
+          <div class="ch-sub">Deportes</div>
+        </div>
+
+        <div class="ch" onclick="play('ESPN 7', '🎯', 'https://streamtpnew.com/global1.php?stream=espn7')">
+          <span class="live-pill">LIVE</span>
+          <div class="ch-icon">🎯</div>
+          <div class="ch-name">ESPN 7</div>
+          <div class="ch-sub">Deportes</div>
+        </div>
+
+        <div class="ch" onclick="play('ESPN Premium', '⭐', 'https://streamtpnew.com/global1.php?stream=espnpremium')">
+          <span class="live-pill">LIVE</span>
+          <div class="ch-icon">⭐</div>
+          <div class="ch-name">ESPN Premium</div>
+          <div class="ch-sub">Premium</div>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- FOX SPORTS -->
+    <div class="section">
+      <div class="section-label">Fox Sports</div>
+      <div class="grid">
+
+        <div class="ch" onclick="play('Fox Sports 1', '🦊', 'https://streamtpnew.com/global1.php?stream=fox1ar')">
+          <span class="live-pill">LIVE</span>
+          <div class="ch-icon">🦊</div>
+          <div class="ch-name">Fox Sports 1</div>
+          <div class="ch-sub">Deportes</div>
+        </div>
+
+        <div class="ch" onclick="play('Fox Sports 2', '🦊', 'https://streamtpnew.com/global1.php?stream=fox2ar')">
+          <span class="live-pill">LIVE</span>
+          <div class="ch-icon">🦊</div>
+          <div class="ch-name">Fox Sports 2</div>
+          <div class="ch-sub">Deportes</div>
+        </div>
+
+        <div class="ch" onclick="play('Fox Sports 3', '🦊', 'https://streamtpnew.com/global1.php?stream=fox3ar')">
+          <span class="live-pill">LIVE</span>
+          <div class="ch-icon">🦊</div>
+          <div class="ch-name">Fox Sports 3</div>
+          <div class="ch-sub">Deportes</div>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- OTROS -->
+    <div class="section">
+      <div class="section-label">Otros</div>
+      <div class="grid">
+
+        <div class="ch" onclick="play('TNT Sports', '⚡', 'https://streamtpnew.com/global1.php?stream=tntsports')">
+          <span class="live-pill">LIVE</span>
+          <div class="ch-icon">⚡</div>
+          <div class="ch-name">TNT Sports</div>
+          <div class="ch-sub">Deportes</div>
+        </div>
+
+        <div class="ch" onclick="play('TV Publica', '📺', 'https://streamtpnew.com/global1.php?stream=tv_publica')">
+          <span class="live-pill">LIVE</span>
+          <div class="ch-icon">📺</div>
+          <div class="ch-name">TV Publica</div>
+          <div class="ch-sub">Abierta</div>
+        </div>
+
+        <div class="ch" onclick="play('TyC Sports', '🏆', 'https://streamtpnew.com/global1.php?stream=tycsports')">
+          <span class="live-pill">LIVE</span>
+          <div class="ch-icon">🏆</div>
+          <div class="ch-name">TyC Sports</div>
+          <div class="ch-sub">Deportes</div>
+        </div>
+
+        <div class="ch" onclick="play('Telefe', '📡', 'https://streamtpnew.com/global1.php?stream=telefe')">
+          <span class="live-pill">LIVE</span>
+          <div class="ch-icon">📡</div>
+          <div class="ch-name">Telefe</div>
+          <div class="ch-sub">Abierta</div>
+        </div>
+
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<!-- ═══════════════ PLAYER ═══════════════ -->
+<div id="view-player" class="view">
+  <header>
+    <button class="btn-back" onclick="goHome()">
+      ← Canales
+    </button>
+    <div class="player-title" id="player-title">—</div>
+    <div class="spacer"></div>
+    <div class="live-badge"><div class="dot"></div>En vivo</div>
+    <div class="btn-fs" onclick="goFullscreen()" title="Pantalla completa">⛶</div>
+  </header>
+
+  <div id="frame-wrap">
+    <div id="loader">
+      <div class="loader-brand"><em>AV</em>STV</div>
+      <div class="loader-ch" id="loader-ch">Cargando...</div>
+      <div class="bar-wrap"><div class="bar-fill"></div></div>
+    </div>
+
+    <iframe
+      id="the-iframe"
+      src="about:blank"
+      allowfullscreen
+      allow="autoplay; fullscreen; picture-in-picture; encrypted-media"
+    ></iframe>
+  </div>
+</div>
+
+<script>
+  function play(name, icon, url) {
+    document.getElementById('view-home').classList.remove('active');
+    document.getElementById('view-player').classList.add('active');
+
+    document.getElementById('player-title').textContent = name;
+    document.getElementById('loader-ch').textContent = name;
+    document.title = name + ' · AVSTV';
+
+    const loader = document.getElementById('loader');
+    loader.classList.remove('gone');
+
+    const iframe = document.getElementById('the-iframe');
+    iframe.src = 'about:blank';
+
+    setTimeout(() => {
+      iframe.src = url;
+      setTimeout(() => loader.classList.add('gone'), 3200);
+    }, 350);
+  }
+
+  function goHome() {
+    document.getElementById('view-player').classList.remove('active');
+    document.getElementById('view-home').classList.add('active');
+    document.getElementById('the-iframe').src = 'about:blank';
+    document.title = 'AVSTV';
+  }
+
+  function goFullscreen() {
+    const wrap = document.getElementById('frame-wrap');
+    if (!document.fullscreenElement) {
+      wrap.requestFullscreen().catch(() => {});
+    } else {
+      document.exitFullscreen();
+    }
+  }
+
+  document.addEventListener('keydown', e => {
+    const onPlayer = document.getElementById('view-player').classList.contains('active');
+    if (e.key === 'Escape' && onPlayer && !document.fullscreenElement) goHome();
+    if ((e.key === 'f' || e.key === 'F') && onPlayer) goFullscreen();
+  });
+</script>
+</body>
+</html>
