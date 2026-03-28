@@ -815,7 +815,7 @@
   };
 
   function loadEventos() {
-    fetch('https://api.allorigins.win/raw?url=' + encodeURIComponent('https://streamtpnew.com/eventos.json?nocache=' + Date.now()))
+    fetch('https://api.codetabs.com/v1/proxy/?quest=https://streamtpnew.com/eventos.json')
       .then(r => r.json())
       .then(events => {
         const section = document.getElementById('eventos-section');
