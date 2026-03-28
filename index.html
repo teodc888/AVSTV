@@ -4,6 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>AVSTV</title>
+<link rel="icon" type="image/png" href="img/logo.png">
 <link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@400;600;700;800&family=Barlow:wght@300;400;500&display=swap" rel="stylesheet">
 <style>
   :root {
@@ -344,6 +345,58 @@
     0%   { transform: translateX(-100%); width: 50%; }
     100% { transform: translateX(300%);  width: 50%; }
   }
+
+  /* ── AD BANNER ── */
+  .ad-banner {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    background: #1a1a2e;
+    border-top: 1px solid var(--accent);
+    padding: 16px 32px;
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    z-index: 999;
+    animation: slideUp .4s ease;
+  }
+  @keyframes slideUp {
+    from { transform: translateY(100%); }
+    to   { transform: translateY(0); }
+  }
+  .ad-banner.hidden { display: none; }
+  .ad-banner-icon { font-size: 28px; flex-shrink: 0; }
+  .ad-banner-text { flex: 1; }
+  .ad-banner-title {
+    font-family: var(--font-head);
+    font-size: 16px;
+    font-weight: 700;
+    letter-spacing: 1px;
+    color: var(--text);
+    margin-bottom: 2px;
+  }
+  .ad-banner-desc {
+    font-size: 13px;
+    color: var(--text-mid);
+    line-height: 1.4;
+  }
+  .ad-banner-desc strong { color: var(--accent); font-weight: 600; }
+  .ad-banner-close {
+    background: var(--accent);
+    border: none;
+    border-radius: var(--r);
+    color: #fff;
+    font-family: var(--font-head);
+    font-size: 13px;
+    font-weight: 700;
+    letter-spacing: 1px;
+    padding: 8px 20px;
+    cursor: pointer;
+    flex-shrink: 0;
+    transition: opacity .15s;
+  }
+  .ad-banner-close:hover { opacity: .85; }
 </style>
 </head>
 <body>
@@ -523,7 +576,31 @@
   </div>
 </div>
 
+<!-- ═══════════════ AD BANNER ═══════════════ -->
+<div id="ad-banner" class="ad-banner hidden">
+  <div class="ad-banner-icon">🛡️</div>
+  <div class="ad-banner-text">
+    <div class="ad-banner-title">Recomendamos usar un bloqueador de publicidad</div>
+    <div class="ad-banner-desc">
+      Para una mejor experiencia, instala <strong>uBlock Origin</strong> en tu navegador.
+      Evita publicidad engañosa y ventanas emergentes no deseadas.
+    </div>
+  </div>
+  <button class="ad-banner-close" onclick="closeBanner()">Entendido</button>
+</div>
+
 <script>
+  // Ad banner
+  (function() {
+    if (!localStorage.getItem('avstv-banner-closed')) {
+      document.getElementById('ad-banner').classList.remove('hidden');
+    }
+  })();
+  function closeBanner() {
+    document.getElementById('ad-banner').classList.add('hidden');
+    localStorage.setItem('avstv-banner-closed', '1');
+  }
+
   function play(name, icon, url) {
     document.getElementById('view-home').classList.remove('active');
     document.getElementById('view-player').classList.add('active');
